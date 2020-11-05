@@ -3,8 +3,6 @@ const sqlite3 = require('sqlite3');
 const { open } = require('sqlite');
 
 // Create a database promise object by connecting to database 
-// with the settings defined in settings.json
-
 const dbPromise = (async () => {
     return open({
         filename: './example.db',
@@ -48,6 +46,3 @@ doQueryCB();
 (async () => {
     doQuery();
 })();
-// module.exports = { func: myFunction };
-
-//module.exports = { getUsers : doQuery };
