@@ -1,44 +1,53 @@
-const Promise = require('bluebird');
-const sqlite = require('sqlite');
-const settings = require('./settings.json');
+// require sqlite to be able to use CRUD-operations on our database
+const sqlite3 = require('sqlite3');
+const { open } = require('sqlite');
 
-const dbCon = sqlite.open(settings.databasefile, {Promise});
+// Create a database promise object by connecting to database 
+// with the settings defined in settings.json
+
+const dbPromise = (async () => {
+    return open({
+        filename: './example.db',
+        driver: sqlite3.Database
+    });
+})();
 
 const doQueryCB = () => {
-    dbCon.then((con) => {
+    open({
+        filename: './example.db',
+        driver: sqlite3.Database
+    }).then((con) => {
         con.all('SELECT username, id FROM users ORDER BY username ASC')
             .then((rows) => {
                 console.log(rows);
             })
-            .catch((error) => {
+            .catch(error => {
                 console.log('Något gick fel');
-                console.log(error)
-            })
-            .finally(() => {
-                console.log('Were done');
+                console.log(error);
             });
-    });
+        }).catch(error => {
+            console.log(error);
+        }).finally(() => {
+            console.log('were finally done with database');
+        });
 };
 
 const doQuery = async () => {
     try {
-        const db = await dbCon;
-        const users = await db.all('SELECT username, id FROM users2 ORDER BY username ASC');
+        const db = await dbPromise;
+        const users = await db.all('SELECT username, id FROM users ORDER BY username ASC');
+        console.log(users);
         return users;
     }
     catch(error) {
-        // console.log('Något gick fel.');
-        // console.log(error);
         throw new Error(error);
-        //return error;
     }
 };
 
-//doQueryCB();
-//doQuery();
-// const myFunction = async() => {
-
-// };
+doQueryCB();
+(async () => {
+    doQuery();
+})();
 // module.exports = { func: myFunction };
 
-module.exports = { getUsers : doQuery };
+//module.exports = { getUsers : doQuery };
